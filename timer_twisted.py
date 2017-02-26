@@ -69,6 +69,14 @@ def capture_camera():
     full_output = os.path.join(img_today_dir, output)
     call_list = [prog, '--height', '720', '--width', '1280', '--output', full_output]
     call(call_list)
+    
+    # Add in a timestamp
+    conv = '/usr/bin/convert'
+    conv_call = [conv, full_output, '-pointsize', '20', 
+            '-gravity', 'SouthWest', '-stroke', "'#000C'", 
+            '-strokewidth', '2', '-annotate', '+10+10', 
+            time_str, '-stroke', 'none', '-fill', 'white', 
+            '-annotate', '+10+10', time_str, full_output]
 
 def is_one_am():
     """
