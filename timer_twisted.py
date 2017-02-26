@@ -64,7 +64,8 @@ def capture_camera():
     # Check if today's directory exists
     if not os.path.exists(img_today_dir):
         os.makedirs(img_today_dir)
-    output = '{}.jpg'.format()
+    time_str = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    output = '{}.jpg'.format(time_str)
     full_output = os.path.join(img_today_dir, output)
     call_list = [prog, '--height', '720', '--width', '1280', '--output', full_output]
     call(call_list)
