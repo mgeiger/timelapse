@@ -88,6 +88,13 @@ def make_video():
             str(yesterday.year), 
             str(yesterday.month).zfill(2), 
             str(yesterday.day).zfill(2))
+    # Need to find all of the *.jpg images in the directory
+    # Need to make a soft link for all of them
+    # Now turn these files into something
+    app = '/usr/bin/avconv'
+    call_list = [app, '-r', '24', '-i', '%05.jpg', 
+            '-codec:v', 'libx264', '-bf', '2', '-flags', '+cgop',
+            '-crf', '21']
 
 def upload_youtube():
     logging.error('Not implemented.')

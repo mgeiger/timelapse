@@ -1,0 +1,9 @@
+astral==1.4
+pytz==2016.10
+Twisted==17.1.0
+PyQt4==4.11.4
+PySide==1.2.4
+google_api_python_client==1.6.2
+httplib2==0.10.3
+picamera==1.13
+progressbar2==3.12.0
