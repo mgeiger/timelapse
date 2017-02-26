@@ -77,6 +77,7 @@ def capture_camera():
             '-strokewidth', '2', '-annotate', '+10+10', 
             time_str, '-stroke', 'none', '-fill', 'white', 
             '-annotate', '+10+10', time_str, full_output]
+    call(conv_call)
 
 def is_one_am():
     """
