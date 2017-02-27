@@ -6,6 +6,7 @@ from astral import Location
 import pytz
 import os
 from subprocess import call
+import glob
 
 
 # Folder Locations
@@ -64,7 +65,7 @@ def capture_camera():
     # Check if today's directory exists
     if not os.path.exists(img_today_dir):
         os.makedirs(img_today_dir)
-    time_str = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    time_str = datetime.now().strftime('%Y-%m-%dT%H:%M')
     output = '{}.jpg'.format(time_str)
     full_output = os.path.join(img_today_dir, output)
     call_list = [prog, '--height', '720', '--width', '1280', '--output', full_output]
@@ -73,7 +74,7 @@ def capture_camera():
     # Add in a timestamp
     conv = '/usr/bin/convert'
     conv_call = [conv, full_output, '-pointsize', '20', 
-            '-gravity', 'SouthWest', '-stroke', "'#000C'", 
+            '-gravity', 'SouthWest', '-stroke', '#000C', 
             '-strokewidth', '2', '-annotate', '+10+10', 
             time_str, '-stroke', 'none', '-fill', 'white', 
             '-annotate', '+10+10', time_str, full_output]
@@ -87,7 +88,7 @@ def is_one_am():
     today_one_am = datetime(year=today.year, month=today.month, 
             day=today.day, hour=1)
     above_one = datetime.now() >= today_one_am
-    less_one = (today_one_am + timedelta(days=1)) > datetime.now()
+    less_one = (today_one_am + timedelta(minutes=1)) > datetime.now()
     return above_one and less_one 
 
 def make_video():
@@ -99,11 +100,20 @@ def make_video():
             str(yesterday.month).zfill(2), 
             str(yesterday.day).zfill(2))
     # Need to find all of the *.jpg images in the directory
+    jpg_list = glob.glob(os.path.join(img_yesterday_dir, "*.jpg"))
+    jpg_list.sort(key=lambda x: os.path.getmtime(x))
     # Need to make a soft link for all of them
+    counter = 0
+    for f in jpg_list:
+        os.symlink(f, os.path.join(img_yesterday_dir, '{:05}.jpg'.format(counter)))
+        counter += 1
     # Now turn these files into something
     app = '/usr/bin/avconv'
-    call_list = [app, '-r', '24', '-i', '%05.jpg', 
-            '-codec:v', 'libx264', '-bf', '2', '-flags', '+cgop',
+    call_list = [app, '-r', '24', 
+            '-i', os.path.join(img_yesterday_dir, '%05.jpg'), 
+            '-codec:v', 'libx264', 
+            '-bf', '2', 
+            '-flags', '+cgop',
             '-crf', '21']
 
 def upload_youtube():
