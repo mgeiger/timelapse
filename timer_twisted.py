@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from twisted.internet import task
 from twisted.internet import reactor
 from datetime import datetime, date, timedelta
