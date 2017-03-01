@@ -18,9 +18,6 @@ vid_dir = os.path.join(base_dir, 'vid')
 # Interval time for trying the camera
 camera_timeout = 60.0
 
-# Location information
-latitude = 42.288611
-longitude = -71.445
 
 logging.basicConfig(format='%(asctime)s : %(message)s', 
         datefmt='%Y-%m-%d %H:%M:%S', 
@@ -40,17 +37,24 @@ class TimeLapseCamera():
     def close(self):
         pass
     
+class Sun(object):
+    # Location information
+    latitude = 42.288611
+    longitude = -71.445
+    city = 'Framingham, MA'
+    country = 'USA'
+    tz = 'US/Eastern'
 
-
-def sun_up():
-    """
-    Determines if the sun is up right now.
-    """
-    loc = Location(('Framingham, MA', 'USA', latitude, longitude, 'US/Eastern', 0))
-    sunrise = loc.sunrise()
-    sunset = loc.sunset()
-    now = datetime.now(pytz.timezone('US/Eastern'))
-    return sunset > now > sunrise
+    @staticmethod
+    def sun_up():
+        """
+        Determines if the sun is up right now.
+        """
+        loc = Location((self.city, self.country, self.latitude, self.longitude, self.tz, 0))
+        sunrise = loc.sunrise()
+        sunset = loc.sunset()
+        now = datetime.now(pytz.timezone(self.tz))
+        return sunset > now > sunrise
 
 def capture_camera():
     """
@@ -123,7 +127,7 @@ def upload_youtube():
 
 def timelapse_arbiter():
     logging.info('Running timelapse arbiter')
-    if sun_up():
+    if Sun().sun_up():
         logging.info('Sun is up. Capturing image.')
         capture_camera()
     if is_one_am():
