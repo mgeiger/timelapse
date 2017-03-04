@@ -43,3 +43,7 @@ MANIFEST
 
 # Virtual Environment
 venv/
+
+# Test Files
+*.jpg
+*.avi
