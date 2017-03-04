@@ -1,4 +1,7 @@
 # Add your requirements here like:
 # numpy
 # scipy>=0.9
-
+astral==1.4
+pytz==2016.10
+Twisted==14.0.2
+picamera<=1.14

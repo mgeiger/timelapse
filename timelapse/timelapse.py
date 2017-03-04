@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 from twisted.internet import task
 from twisted.internet import reactor
 from datetime import datetime, date, timedelta
@@ -9,6 +10,9 @@ import os
 from subprocess import call
 import glob
 
+__author__ = "Matthew J. Geiger"
+__copyright__ = "Matthew J. Geiger"
+__license__ = "none"
 
 # Folder Locations
 base_dir = '/opt/camera'
@@ -18,7 +22,8 @@ vid_dir = os.path.join(base_dir, 'vid')
 # Interval time for trying the camera
 camera_timeout = 60.0
 
-
+# Logging Options
+_logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s : %(message)s', 
         datefmt='%Y-%m-%d %H:%M:%S', 
         level=logging.INFO)
@@ -136,8 +141,73 @@ def timelapse_arbiter():
         make_video()
         upload_youtube()
 
-logging.info('Starting logging timer.')
-loop_camera = task.LoopingCall(timelapse_arbiter)
-loop_camera.start(camera_timeout)
+def parse_args(args):
+    """Parse command line parameters
 
-reactor.run()
+    Args:
+        args ([str]): command line parameters as list of strings
+
+    Returns:
+        :obj:`argparse.Namespace`: command line paramters namespace
+    """
+    parser = argparser.ArgumentParser(
+            description="Backyard Raspberry Pi Timelapse Camera")
+    parser.add_argument(
+            '--version',
+            action='version',
+            version='timelapse {ver}'.format(ver=__version__))
+    parser.add_argument(
+            '-c',
+            '--capture',
+            help="The timelapse capture duration in seconds.",
+            type=int,
+            action='store_const',
+            const=60)
+    parser.add_argument(
+            '-s',
+            '--storage',
+            help="The default storage directory for images.",
+            type=str)
+    parser.add_argument(
+            '-vv',
+            '--very-verbose',
+            dest="loglevel",
+            help="Set LogLevel to DEBUG",
+            action='store_const',
+            const=logging.DEBUG)
+    return parser.parse_args(args)
+
+def setup_logging(loglevel):
+    """Setup basic logging
+
+    Args:
+        loglevel (int): minimum loglevel for emitting messages
+    """
+    logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
+    logging.basicConfig(level=loglevel, stream=sys.stdout,
+            format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
+
+def main(args):
+    """Main entry point allowing external calls
+
+    Args:
+        args ([str]): command line parameter list
+    """
+    args = parse_args(args)
+    setup_logging(args.loglevel)
+    _logger.debug("Starting timelapse camera...")
+
+    logging.info('Starting logging timer.')
+    loop_camera = task.LoopingCall(timelapse_arbiter)
+    loop_camera.start(camera_timeout)
+
+    reactor.run()
+
+def run():
+    """Entry point for console_scripts
+    """
+    main(sys.argv[1:])
+
+if __name__ == "__main__":
+    run()
+

@@ -45,5 +45,6 @@ MANIFEST
 venv/
 
 # Test Files
+images/
 *.jpg
 *.avi
