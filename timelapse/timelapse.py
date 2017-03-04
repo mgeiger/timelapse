@@ -1,18 +1,22 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from twisted.internet import task
-from twisted.internet import reactor
-from datetime import datetime, date, timedelta
-import logging
-from astral import Location
-import pytz
-import os
-from subprocess import call
+
 import glob
+import logging
+import os
+import pytz
+import sys
+
+from astral import Location
+from datetime import datetime, date, timedelta
+from subprocess import call
+from twisted.internet import reactor
+from twisted.internet import task
 
 __author__ = "Matthew J. Geiger"
 __copyright__ = "Matthew J. Geiger"
 __license__ = "none"
+__version__ = 0.0.1
 
 # Folder Locations
 base_dir = '/opt/camera'
@@ -128,11 +132,11 @@ def make_video():
             '-crf', '21']
 
 def upload_youtube():
-    logging.error('Not implemented.')
-    logging.info('Uploading to Youtube.')
+    _logger.error('Not implemented.')
+    _logger.info('Uploading to Youtube.')
 
 def timelapse_arbiter():
-    logging.info('Running timelapse arbiter')
+    _logger.info('Running timelapse arbiter')
     if Sun().sun_up():
         logging.info('Sun is up. Capturing image.')
         capture_camera()
@@ -195,9 +199,8 @@ def main(args):
     """
     args = parse_args(args)
     setup_logging(args.loglevel)
-    _logger.debug("Starting timelapse camera...")
 
-    logging.info('Starting logging timer.')
+    _logger.debug("Starting timelapse camera...")
     loop_camera = task.LoopingCall(timelapse_arbiter)
     loop_camera.start(camera_timeout)
 
