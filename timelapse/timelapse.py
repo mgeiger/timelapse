@@ -6,7 +6,8 @@ import logging
 import os
 import pytz
 import sys
-
+import argparse
+from socket import gethostname
 from astral import Location
 from datetime import datetime, date, timedelta
 from subprocess import call
@@ -16,7 +17,7 @@ from twisted.internet import task
 __author__ = "Matthew J. Geiger"
 __copyright__ = "Matthew J. Geiger"
 __license__ = "none"
-__version__ = 0.0.1
+__version__ = '0.0.1'
 
 # Folder Locations
 base_dir = '/opt/camera'
@@ -28,7 +29,8 @@ camera_timeout = 60.0
 
 # Logging Options
 _logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s : %(message)s', 
+logformat = "[%(asctime)s] %(levelname)s:%(name)s: %(message)s"
+logging.basicConfig(format=logformat,
         datefmt='%Y-%m-%d %H:%M:%S', 
         level=logging.INFO)
 
@@ -130,6 +132,9 @@ def make_video():
             '-bf', '2', 
             '-flags', '+cgop',
             '-crf', '21']
+    logging.error('Converting to a video is not yet implemented.')
+    # Now delete all these files
+    logging.error('Deleting files is not yet implemented.')
 
 def upload_youtube():
     _logger.error('Not implemented.')
@@ -137,15 +142,21 @@ def upload_youtube():
 
 def timelapse_arbiter():
     _logger.info('Running timelapse arbiter')
-    if Sun().sun_up():
-        logging.info('Sun is up. Capturing image.')
-        capture_camera()
-    if is_one_am():
-        logging.info('Making video and uploading.')
-        make_video()
-        upload_youtube()
+    _logger.info('Hostname: {}'.format(gethostname()))
+    if gethostname() == 'camera':
+        _logger.info('Running as camera')
+        if Sun().sun_up():
+            logging.info('Sun is up. Capturing image.')
+            capture_camera()
+        if is_one_am():
+            logging.info('Making video and uploading.')
+            make_video()
+            upload_youtube()
+    else:
+        _logger.info('My hostname is not camera.')
+        pass
 
-def parse_args(args):
+def parse_args(args=None):
     """Parse command line parameters
 
     Args:
@@ -154,7 +165,7 @@ def parse_args(args):
     Returns:
         :obj:`argparse.Namespace`: command line paramters namespace
     """
-    parser = argparser.ArgumentParser(
+    parser = argparse.ArgumentParser(
             description="Backyard Raspberry Pi Timelapse Camera")
     parser.add_argument(
             '--version',
@@ -181,24 +192,18 @@ def parse_args(args):
             const=logging.DEBUG)
     return parser.parse_args(args)
 
-def setup_logging(loglevel):
+def setup_logging(loglevel=logging.DEBUG):
     """Setup basic logging
 
     Args:
         loglevel (int): minimum loglevel for emitting messages
     """
-    logformat = "[%(asctime)s] %(levelname)s:%(name)s:%(message)s"
     logging.basicConfig(level=loglevel, stream=sys.stdout,
             format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
 
-def main(args):
+def main():
     """Main entry point allowing external calls
-
-    Args:
-        args ([str]): command line parameter list
     """
-    args = parse_args(args)
-    setup_logging(args.loglevel)
 
     _logger.debug("Starting timelapse camera...")
     loop_camera = task.LoopingCall(timelapse_arbiter)
@@ -209,8 +214,12 @@ def main(args):
 def run():
     """Entry point for console_scripts
     """
-    main(sys.argv[1:])
+    main()
 
 if __name__ == "__main__":
+    # args = parse_args()
+    # args = parse_args(args)
+    # setup_logging(args.loglevel)
+    setup_logging()
     run()
 
