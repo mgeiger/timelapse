@@ -1,0 +1,10 @@
+[Unit]
+Description=Raspberry Pi Timelapse Service
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python /opt/camera/timelapse/timelapse/timelapse.py
+
+[Install]
+WantedBy=multi-user.target
