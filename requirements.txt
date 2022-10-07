@@ -3,5 +3,5 @@
 # scipy>=0.9
 astral==1.4
 pytz==2016.10
-Twisted==14.0.2
+Twisted==22.4.0
 # picamera<=1.14
